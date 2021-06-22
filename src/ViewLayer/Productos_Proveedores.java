@@ -18,7 +18,7 @@ public class Productos_Proveedores extends javax.swing.JInternalFrame {
         cbProductos.setModel(llenarComboProductos());
         cbProveedores.setModel(llenarComboProveedores());
         mostrarDatosTabla();
-        JOptionPane.showMessageDialog(null, "No funciona del todo.");
+        
 
     }
 
@@ -68,15 +68,15 @@ public class Productos_Proveedores extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1)
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(cbProductos, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 208, Short.MAX_VALUE)
                         .addComponent(btnAñadir)
                         .addGap(26, 26, 26)
-                        .addComponent(cbProveedores, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 571, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(cbProveedores, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(184, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -117,10 +117,77 @@ public class Productos_Proveedores extends javax.swing.JInternalFrame {
     private void btnAñadirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAñadirActionPerformed
 
         mostrarDatosTabla();
-
+        añadirDatos();
     }//GEN-LAST:event_btnAñadirActionPerformed
 
     //MÉTODOS
+    
+    public void mostrarDatosTabla() {
+
+        String[] titulosTabla = {"ID Proveedor", "Nombre Proveedor", "ID Producto", "Nombre Producto"};
+        String[] registros = new String[4];
+
+        DefaultTableModel modelo = new DefaultTableModel(null, titulosTabla);
+
+        String Query = "SELECT pr.idProveedor IdProveedor, pr.nombre NombreProveedor, p.idProducto IdProducto, p.nombre NombreProducto  FROM ProductosProveedores pp\n"
+                + "INNER JOIN Productos p ON p.idProducto = pp.idProducto\n"
+                + "INNER JOIN Proveedores pr ON pr.idProveedor = pp.idProveedor";
+
+        try {
+
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery(Query);
+
+            while (rs.next()) {
+
+                //JOptionPane.showMessageDialog(null, "Si entra");
+                registros[0] = rs.getString("idProveedor"); 
+                registros[1] = rs.getString("NombreProveedor"); 
+                registros[2] = rs.getString("idProducto"); 
+                registros[3] = rs.getString("NombreProducto"); 
+
+                modelo.addRow(registros);
+
+            }
+
+            tablaContactos.setModel(modelo);
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error al obtener la información para la tabla --> " + e);
+        }
+
+    }
+    
+    public void añadirDatos() {
+
+        int idProducto = obtenerIdProducto(cbProductos.getSelectedItem().toString());
+        int idProveedor = obtenerIdProveedor(cbProveedores.getSelectedItem().toString());
+        
+        System.out.println("Producto" + idProducto);
+            System.out.println("Proveedor" + idProveedor);
+ 
+        try {
+
+            Connection con = Conexion.getConexion();
+
+            String query = "INSERT INTO ProductosProveedores (idProveedor, idProducto) VALUES (" + idProveedor + " ," + idProducto + ")";
+
+            PreparedStatement ps = con.prepareStatement(query);
+            
+            //ps.setInt(1, idProducto);
+            //ps.setInt(2, idProveedor);     
+            //ps.setInt(3, precio);
+
+            ps.executeUpdate();
+            
+            mostrarDatosTabla();
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error al guardar los datos --> " + e);
+        }
+
+    }
+    
     public DefaultComboBoxModel llenarComboProductos() {
 
         DefaultComboBoxModel modeloCombo = new DefaultComboBoxModel();
@@ -173,37 +240,7 @@ public class Productos_Proveedores extends javax.swing.JInternalFrame {
 
     }
 
-    public void mostrarDatosTabla() {
-
-        String[] titulosTabla = {"Productos", "Proveedores"};
-        String[] registros = new String[2];
-
-        DefaultTableModel modelo = new DefaultTableModel(null, titulosTabla);
-
-        String Query = "SELECT prod.nombre, prov.nombre From Productos prod CROSS JOIN Proveedores prov";
-
-        try {
-
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery(Query);
-
-            while (rs.next()) {
-
-                //JOptionPane.showMessageDialog(null, "Si entra");
-                registros[0] = rs.getString("nombre"); //Nombre de productos.
-                registros[1] = rs.getString("nombre"); //Nombre de proveedores.
-
-                modelo.addRow(registros);
-
-            }
-
-            tablaContactos.setModel(modelo);
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Error al obtener la información para la tabla --> " + e);
-        }
-
-    }
+    
 
     public int obtenerIdProducto(String nombreProducto) {
 
@@ -224,7 +261,7 @@ public class Productos_Proveedores extends javax.swing.JInternalFrame {
             }
 
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al obtener el id Estado --> " + e);
+            JOptionPane.showMessageDialog(null, "Error al obtener el id Producto --> " + e);
         }
         return idProductoObtenido;
 
@@ -234,7 +271,7 @@ public class Productos_Proveedores extends javax.swing.JInternalFrame {
 
         idProveedorObtenido = 0;
 
-        String Query = "SELECT idCategoria FROM Categorias WHERE nombre = '" + nombreProveedor + "'";
+        String Query = "SELECT idProveedor FROM Proveedores WHERE nombre = '" + nombreProveedor + "'";
 
         try {
 
@@ -255,40 +292,7 @@ public class Productos_Proveedores extends javax.swing.JInternalFrame {
 
     }
 
-    public void ordenarTabla() {
-
-        String[] titulosTabla = {"ID Contacto", "Código Postal", "Entidad", "Comuna", "Calle", "Teléfono"};
-        String[] registros = new String[6];
-
-        DefaultTableModel modelo = new DefaultTableModel(null, titulosTabla);
-
-        String Query = "SELECT idContacto, codigoPostal, entidad, comuna, calle, telefono FROM Contactos ORDER BY calle ASC";
-
-        try {
-
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery(Query);
-
-            while (rs.next()) {
-
-                registros[0] = rs.getString("idContacto");
-                registros[1] = rs.getString("codigoPostal");
-                registros[2] = rs.getString("entidad");
-                registros[3] = rs.getString("comuna");
-                registros[4] = rs.getString("calle");
-                registros[5] = rs.getString("telefono");
-
-                modelo.addRow(registros);
-
-            }
-
-            tablaContactos.setModel(modelo);
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Error al obtener la información para la tabla --> " + e);
-        }
-
-    }
+    
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

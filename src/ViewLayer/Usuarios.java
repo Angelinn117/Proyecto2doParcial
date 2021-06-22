@@ -114,6 +114,12 @@ public class Usuarios extends javax.swing.JInternalFrame {
         jLabel5.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
         jLabel5.setText("Activo:");
 
+        cbUsuarios_Sucursales.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbUsuarios_SucursalesActionPerformed(evt);
+            }
+        });
+
         jMenu1.setText("Ordenar Tabla");
 
         jmOrdenarID.setText("Ordenar por ID");
@@ -318,6 +324,10 @@ public class Usuarios extends javax.swing.JInternalFrame {
 
 
     }//GEN-LAST:event_jmBuscarNombreUsuarioActionPerformed
+
+    private void cbUsuarios_SucursalesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbUsuarios_SucursalesActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cbUsuarios_SucursalesActionPerformed
 
     //MÉTODOS
     public int obtenerIdSucursales(String nombreSucursal) {
